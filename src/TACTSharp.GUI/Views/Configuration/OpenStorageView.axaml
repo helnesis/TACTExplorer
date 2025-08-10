@@ -6,8 +6,8 @@
         xmlns:converters="clr-namespace:Avalonia.Controls.Converters;assembly=Avalonia.Controls"
         xmlns:enums="using:TACTSharp.GUI.Enums"
         xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia.ProgressRing"
-        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="350"
-        Width="500" Height="350"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="400"
+        Width="500" Height="400"
         CanResize="False"
         x:Class="TACTSharp.GUI.Views.Configuration.OpenStorageView"
         x:DataType="vm:OpenStorageViewModel"
@@ -28,7 +28,7 @@
                 <StackPanel Margin="5"
                         IsVisible="{Binding StorageType, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static enums:StorageType.Online}}">
                         
-                        <Label FontWeight="DemiBold" Content="Available servers"/>
+                        <Label Margin="20" FontWeight="DemiBold" Content="Available servers"/>
 
                         <DataGrid Height="150" Margin="20" 
                                 IsReadOnly="True"
