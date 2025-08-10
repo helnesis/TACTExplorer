@@ -1,0 +1,62 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:TACTSharp.GUI.ViewModels.Configuration"
+        xmlns:converters="clr-namespace:Avalonia.Controls.Converters;assembly=Avalonia.Controls"
+        xmlns:enums="using:TACTSharp.GUI.Enums"
+        xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia.ProgressRing"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="350"
+        Width="500" Height="350"
+        CanResize="False"
+        x:Class="TACTSharp.GUI.Views.Configuration.OpenStorageView"
+        x:DataType="vm:OpenStorageViewModel"
+        Title="{Binding WindowTitle}">
+        
+        <Window.Resources>
+                <converters:EnumToBoolConverter x:Key="EnumToBool" />
+        </Window.Resources>
+
+        
+        <Grid>
+                <!-- Local Storage Configuration -->
+                <StackPanel IsVisible="{Binding StorageType, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static enums:StorageType.Local}}">
+                        
+                </StackPanel>
+                
+                <!-- Online Storage Configuration -->
+                <StackPanel Margin="5"
+                        IsVisible="{Binding StorageType, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static enums:StorageType.Online}}">
+                        
+                        <Label FontWeight="DemiBold" Content="Available servers"/>
+
+                        <DataGrid Height="150" Margin="20" 
+                                IsReadOnly="True"
+                                CanUserReorderColumns="False"
+                                CanUserResizeColumns="True"
+                                CanUserSortColumns="False"
+                                GridLinesVisibility="All"
+                                BorderThickness="1" BorderBrush="Gray"
+                                SelectedItem="{Binding SelectedServer}"
+                                ItemsSource="{Binding AvailableServers}">
+                                
+                                <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Host" Binding="{Binding Host}"/>
+                                        <DataGridTextColumn Header="Version" Binding="{Binding Version}"/>
+                                </DataGrid.Columns>
+                        </DataGrid>
+                        
+                        
+                        <StackPanel Orientation="Vertical">
+                                <controls:ProgressRing IsVisible="{Binding IsLoading}" IsIndeterminate="True" BorderThickness="5" />
+                                <Label IsVisible="{Binding IsLoading}" HorizontalAlignment="Center" Content="Opening TACT Storage ..."/>
+                                <Button Margin="20" HorizontalContentAlignment="Center" Width="150" Command="{Binding LoadStorageCommand}" IsEnabled="{Binding !IsLoading}" HorizontalAlignment="Center" Content="Open"/>
+                        </StackPanel>
+
+                        
+                </StackPanel>
+        </Grid>
+        
+        
+</Window>
+

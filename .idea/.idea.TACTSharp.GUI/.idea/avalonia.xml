@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AvaloniaProject">
+    <option name="projectPerEditor">
+      <map>
+        <entry key="App.axaml" value="TACTSharp.GUI.csproj" />
+        <entry key="Views/Configuration/OpenStorageView.axaml" value="TACTSharp.GUI.csproj" />
+        <entry key="Views/MainWindow.axaml" value="TACTSharp.GUI.csproj" />
+        <entry key="src/App.axaml" value="src/TACTSharp.GUI.csproj" />
+        <entry key="src/TACTSharp.GUI/App.axaml" value="src/TACTSharp.GUI/TACTSharp.GUI.csproj" />
+        <entry key="src/TACTSharp.GUI/Views/Configuration/OpenStorageView.axaml" value="src/TACTSharp.GUI/TACTSharp.GUI.csproj" />
+        <entry key="src/TACTSharp.GUI/Views/MainWindow.axaml" value="src/TACTSharp.GUI/TACTSharp.GUI.csproj" />
+        <entry key="src/Views/Configuration/OpenStorageView.axaml" value="src/TACTSharp.GUI.csproj" />
+        <entry key="src/Views/MainWindow.axaml" value="src/TACTSharp.GUI.csproj" />
+      </map>
+    </option>
+  </component>
+</project>

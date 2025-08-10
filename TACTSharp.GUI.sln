@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TACTSharp.GUI", "./src/TACTSharp.GUI/TACTSharp.GUI.csproj", "{FDA30612-7266-445B-8ABC-96DA8B6330AD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TACTSharp", "deps\TACTSharp\TACTSharp\TACTSharp.csproj", "{AE339FAD-57E8-4D35-9528-9F7729C4BAB9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TACTSharp.GUI.Tests", "src\TACTSharp.GUI.Tests\TACTSharp.GUI.Tests.csproj", "{702632F8-6F02-4BA1-8F73-99C06E880AF5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FDA30612-7266-445B-8ABC-96DA8B6330AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDA30612-7266-445B-8ABC-96DA8B6330AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDA30612-7266-445B-8ABC-96DA8B6330AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDA30612-7266-445B-8ABC-96DA8B6330AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE339FAD-57E8-4D35-9528-9F7729C4BAB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE339FAD-57E8-4D35-9528-9F7729C4BAB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE339FAD-57E8-4D35-9528-9F7729C4BAB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE339FAD-57E8-4D35-9528-9F7729C4BAB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{702632F8-6F02-4BA1-8F73-99C06E880AF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{702632F8-6F02-4BA1-8F73-99C06E880AF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{702632F8-6F02-4BA1-8F73-99C06E880AF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{702632F8-6F02-4BA1-8F73-99C06E880AF5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

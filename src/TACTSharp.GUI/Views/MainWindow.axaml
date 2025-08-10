@@ -1,0 +1,90 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:TACTSharp.GUI.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:enums="using:TACTSharp.GUI.Enums"
+        xmlns:models="clr-namespace:TACTSharp.GUI.Models"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="TACTSharp.GUI.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="TACT Explorer">
+
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+    
+    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,*" ShowGridLines="False">
+        <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" RowDefinitions="Auto,*" Background="WhiteSmoke">
+            <Menu Grid.Row="0" VerticalAlignment="Top">
+                <MenuItem FontFamily="JetBrainsMono" Header="_File">
+                    <MenuItem Header="_Open TACT storage">
+                        <MenuItem  Command="{Binding OpenStorageConfigurationCommand}" CommandParameter="{x:Static enums:StorageType.Online}" Header="_Online Storage"/>
+                        <MenuItem Command="{Binding OpenStorageConfigurationCommand}" CommandParameter="{x:Static enums:StorageType.Local}" Header="_Local Storage"/>
+                    </MenuItem>
+                    <MenuItem Header="_Settings"/>
+                </MenuItem>
+                <MenuItem Header="_Help">
+                    <MenuItem Header="_About"/>
+                </MenuItem>
+            </Menu>
+
+            <StackPanel Margin="10,5,0,5" Grid.Row="1" Orientation="Horizontal" Spacing="5">
+                <Label FontFamily="JetBrainsMono" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Content="Search"/>
+                <TextBox Text="{Binding SearchText}" FontSize="10" FontFamily="JetBrainsMono" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" Width="150" MinHeight="0" Height="25" />
+            </StackPanel>
+        </Grid>
+        
+        <TreeDataGrid
+            Grid.Column="0" 
+            Background="WhiteSmoke" 
+            Grid.Row="1" 
+            Source="{Binding HierarchicalTreeDataGridSource}">
+            
+            <TreeDataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Command="{Binding ExtractCommand}" Header="Extract"/>
+                </ContextMenu>
+            </TreeDataGrid.ContextMenu>
+            
+            <TreeDataGrid.Resources>
+                <DataTemplate x:Key="Name" DataType="models:TactEntry">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Margin="0 0 4 0"
+                               VerticalAlignment="Center"
+                               Source="{Binding Type, Converter={x:Static vm:MainWindowViewModel.FileIconConverter}}"/>
+                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </DataTemplate>
+            </TreeDataGrid.Resources>
+        </TreeDataGrid>
+        
+        <TreeDataGrid
+            Grid.Column="1" 
+            Background="WhiteSmoke" 
+            Grid.Row="1" 
+            Source="{Binding ChildHierarchicalTreeDataGridSource}">
+            
+            <TreeDataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Command="{Binding ExtractCommand}" Header="Extract"/>
+                </ContextMenu>
+            </TreeDataGrid.ContextMenu>
+            
+            <TreeDataGrid.Resources>
+                <DataTemplate x:Key="Name" DataType="models:TactEntry">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Margin="0 0 4 0"
+                               VerticalAlignment="Center"
+                               Source="{Binding Type, Converter={x:Static vm:MainWindowViewModel.FileIconConverter}}"/>
+                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </DataTemplate>
+            </TreeDataGrid.Resources>
+        </TreeDataGrid>
+    </Grid>
+
+</Window>

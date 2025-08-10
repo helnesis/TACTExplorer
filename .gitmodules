@@ -1,0 +1,3 @@
+[submodule "deps/TACTSharp"]
+	path = deps/TACTSharp
+	url = git@github.com:wowdev/TACTSharp.git

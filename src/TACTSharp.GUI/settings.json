@@ -1,0 +1,22 @@
+{
+  "Storage": {
+    "Region": "eu",
+    "Product": "wow",
+    "Locale": "enGB",
+    "Servers": [
+      {
+        "Host": "eu.cdn.helnesis.ch",
+        "VersionsUri": "http://eu.cdn.helnesis.ch/versions",
+        "CdnsUri": "http://eu.cdn.helnesis.ch/cdns"
+      }
+    ],
+    "Cache": {
+      "BuildKey": "",
+      "CdnKey": ""
+    }
+  },
+  "Listfile": {
+    "Uri": "https://github.com/wowdev/wow-listfile/releases/latest/download/verified-listfile.csv",
+    "CheckForUpdates": true
+  }
+}
