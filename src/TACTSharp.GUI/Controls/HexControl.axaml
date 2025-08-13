@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:TACTSharp.GUI.ViewModels.Controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TACTSharp.GUI.Controls.HexControl"
+             x:DataType="vm:HexControlViewModel">
+    
+    <ScrollViewer>
+        <ItemsRepeater ItemsSource="{Binding Sections}">
+            <ItemsRepeater.ItemTemplate>
+                <DataTemplate>
+                    <Grid ColumnDefinitions="*, *, *">
+                        <TextBlock Grid.Column="0" Text="{Binding FormattedOffset}"/>
+                        <TextBlock Grid.Column="1" Text="{Binding FormattedBytes}"/>
+                        <TextBlock Grid.Column="2" Text="{Binding FormattedAscii}"/>
+
+                    </Grid>
+                </DataTemplate>
+            </ItemsRepeater.ItemTemplate>
+        </ItemsRepeater>
+    </ScrollViewer>
+    
+</UserControl>
+
+
+

@@ -37,6 +37,7 @@ public sealed class TactService(IConfiguration configuration, IListfileService l
                 AdditionalCDNs = storageSection?.AdditionalServers.Select(s => s.Host).ToList() ?? []
             }
         };
+
     }
 
     public async Task LoadOnlineStorage(ServerInfo serverInfo)

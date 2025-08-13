@@ -18,9 +18,11 @@ using CommunityToolkit.Mvvm.Messaging;
 using HanumanInstitute.MvvmDialogs;
 using TACTSharp.GUI.Enums;
 using TACTSharp.GUI.Messages;
+using TACTSharp.GUI.Messages.ActionMessages;
 using TACTSharp.GUI.Models;
 using TACTSharp.GUI.Services.Listfile;
 using TACTSharp.GUI.Services.Tact;
+using TACTSharp.GUI.ViewModels.Controls;
 
 namespace TACTSharp.GUI.ViewModels;
 
@@ -58,30 +60,27 @@ public partial class MainWindowViewModel(ITactService tact, IListfileService lis
     private async Task Extract()
     {
         if (SelectedEntry is null) return;
-
-
-
+        
         var dialog = await dialogService.ShowOpenFolderDialogAsync(this);
 
         if (dialog is null) return;
         
-        
-        TactEntry entry = SelectedEntry;
+        var entry = SelectedEntry;
         
         // Prioritize child selection if available.
         if (ChildSelectedEntry is not null) entry = ChildSelectedEntry;
         
-        InternalExtract(entry.Type == EntryType.Directory ? entry.Files : [entry], dialog.LocalPath);
+        await InternalExtract(entry.Type == EntryType.Directory ? entry.Files : [entry], dialog.LocalPath);
     }
 
 
-    private async Task InternalExtract(List<TactEntry> entries, string extractTo)
+    private async Task InternalExtract(IReadOnlyList<TactEntry> entries, string extractTo)
     {
         if (entries.Count == 0 || tact.Instance?.Root is null) return;
 
         foreach (var entry in entries)
         {
-            var fid = entry.MetaData?.FileDataId ?? 0;
+            var fid = entry.FileMetaData?.FileDataId ?? 0;
 
             if (fid != 0)
             {
@@ -89,7 +88,6 @@ public partial class MainWindowViewModel(ITactService tact, IListfileService lis
                 var p = entry.ReconstitutePath();
                 var filePath = Path.Combine(extractTo, p);
                 
-                Console.WriteLine(filePath);
                 if (!Directory.Exists(Path.GetDirectoryName(filePath)))
                     Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
                 
@@ -142,13 +140,14 @@ public partial class MainWindowViewModel(ITactService tact, IListfileService lis
             {
                 new HierarchicalExpanderColumn<TactEntry>(
                     new TemplateColumn<TactEntry>("Name", "Name"),
-                    x => x.Files.Concat(x.Directories),
-                    x => x.Files.Concat(x.Directories).Any()
+                    x => x.All,
+                    x => x.All.Any()
                 ),
-                new TextColumn<TactEntry, uint>("FileDataId", x => x.MetaData != null ? x.MetaData.Value.FileDataId : 0),
-                new TextColumn<TactEntry, RootInstance.LocaleFlags>("LocaleFlags", x => x.MetaData != null ? x.MetaData.Value.LocaleFlags : default),
-                new TextColumn<TactEntry, RootInstance.ContentFlags>("ContentFlags", x => x.MetaData != null ? x.MetaData.Value.ContentFlags : default),
-                new TextColumn<TactEntry, string>("Size", x => x.MetaData != null ? $"{Math.Ceiling(x.MetaData.Value.Size.Size)} {x.MetaData.Value.Size.Unit}" : ""),
+                new TextColumn<TactEntry, string>("Extension", x => x.FileMetaData != null ? x.FileMetaData.Value.Type : string.Empty),
+                new TextColumn<TactEntry, uint>("FileDataId", x => x.FileMetaData != null ? x.FileMetaData.Value.FileDataId : 0),
+                new TextColumn<TactEntry, RootInstance.LocaleFlags>("LocaleFlags", x => x.FileMetaData != null ? x.FileMetaData.Value.LocaleFlags : default),
+                new TextColumn<TactEntry, RootInstance.ContentFlags>("ContentFlags", x => x.FileMetaData != null ? x.FileMetaData.Value.ContentFlags : default),
+                new TextColumn<TactEntry, string>("Size", x => x.FileMetaData != null ? $"{Math.Ceiling(x.FileMetaData.Value.Size.Size)} {x.FileMetaData.Value.Size.Unit}" : ""),
                 new TextColumn<TactEntry, EntryType>("Type", x => x.Type),
 
             }
@@ -190,17 +189,28 @@ public partial class MainWindowViewModel(ITactService tact, IListfileService lis
         CreateChildHierarchicalTreeDataGridSource(children);
     }
     
-    private void ChildSelectionChanged(object? sender, TreeSelectionModelSelectionChangedEventArgs<TactEntry> e)
+    private async void ChildSelectionChanged(object? sender, TreeSelectionModelSelectionChangedEventArgs<TactEntry> e)
     {
         if (ChildHierarchicalTreeDataGridSource == null) return;
         var rowSelection = GetRowSelection(ChildHierarchicalTreeDataGridSource);
         
-        if (rowSelection.SelectedItem is not null)
+        if (rowSelection.SelectedItem is null) return;
+        
+        ChildSelectedEntry = rowSelection.SelectedItem;
+
+        if (ChildSelectedEntry is not { Type: EntryType.File, FileMetaData: { } fileMetaData }) return;
+        
+        // Handle file visualization based on file type.
+        var fileBytes = tact.Instance!.OpenFileByFDID(fileMetaData.FileDataId);
+        
+        switch (fileMetaData.Type)
         {
-            
-           ChildSelectedEntry = rowSelection.SelectedItem;
-           
+            case ".m2":
+            case ".wmo":
+                await WeakReferenceMessenger.Default.Send(new FileVisualizationMessage<HexControlViewModel>(fileBytes));
+                break;
         }
+
     }
     
     private static ITreeDataGridRowSelectionModel<TactEntry> GetRowSelection(ITreeDataGridSource source)

@@ -8,6 +8,7 @@
         <entry key="Views/MainWindow.axaml" value="TACTSharp.GUI.csproj" />
         <entry key="src/App.axaml" value="src/TACTSharp.GUI.csproj" />
         <entry key="src/TACTSharp.GUI/App.axaml" value="src/TACTSharp.GUI/TACTSharp.GUI.csproj" />
+        <entry key="src/TACTSharp.GUI/Controls/HexControl.axaml" value="src/TACTSharp.GUI/TACTSharp.GUI.csproj" />
         <entry key="src/TACTSharp.GUI/Views/Configuration/OpenStorageView.axaml" value="src/TACTSharp.GUI/TACTSharp.GUI.csproj" />
         <entry key="src/TACTSharp.GUI/Views/MainWindow.axaml" value="src/TACTSharp.GUI/TACTSharp.GUI.csproj" />
         <entry key="src/Views/Configuration/OpenStorageView.axaml" value="src/TACTSharp.GUI.csproj" />

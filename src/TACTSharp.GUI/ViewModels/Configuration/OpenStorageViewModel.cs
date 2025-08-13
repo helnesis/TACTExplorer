@@ -1,11 +1,14 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Avalonia;
+using Avalonia.Controls.Shapes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -16,6 +19,7 @@ using TACTSharp.GUI.Models;
 using TACTSharp.GUI.Services.Listfile;
 using TACTSharp.GUI.Services.Tact;
 using TACTSharp.GUI.Utilities;
+using Path = System.IO.Path;
 
 namespace TACTSharp.GUI.ViewModels.Configuration;
 
@@ -84,8 +88,8 @@ public partial class OpenStorageViewModel(ITactService storageService, IConfigur
         if (storageService.Instance?.Root is null
             || storageService.Instance?.Encoding is null
             || storageService.Instance?.FileIndex is null) return null;
+        
         await listfile.LoadListfileAsync();
-
         var root = new TactEntryBuilder("Root", EntryType.Directory, null);
         
         foreach (var (key, value) in listfile.Listfile)
@@ -97,20 +101,27 @@ public partial class OpenStorageViewModel(ITactService storageService, IConfigur
 
             var rootEntry = storageService.Instance.Root.GetEntriesByFDID(key);
             var encodingResult = storageService.Instance.Encoding.FindContentKey(rootEntry[0].md5.AsSpan());
-            
-            var meta = new FileMetaData
-            {
-                Size = SizeUnit.GetSize(encodingResult.DecodedFileSize),
-                FileDataId = rootEntry[0].fileDataID,
-                LocaleFlags = rootEntry[0].localeFlags,
-                ContentFlags = rootEntry[0].contentFlags,
-            };
+
+
+            FileMetaData? meta = null;
             
             for(int i = 0; i < segments.Length; i++)
             {
                 var name = segments[i];
                 var type = (i == segments.Length - 1) ? EntryType.File : EntryType.Directory;
 
+                if (type == EntryType.File)
+                {
+                    meta = new FileMetaData
+                    {
+                        Size = SizeUnit.GetSize(encodingResult.DecodedFileSize),
+                        Type = Path.GetExtension(name),
+                        FileDataId = rootEntry[0].fileDataID,
+                        LocaleFlags = rootEntry[0].localeFlags,
+                        ContentFlags = rootEntry[0].contentFlags,
+                    };
+                }
+                
                 node = node.GetOrAdd(name, type, type == EntryType.File ? meta : null);
             }
         }

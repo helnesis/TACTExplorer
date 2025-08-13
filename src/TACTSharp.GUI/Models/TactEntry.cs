@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Reactive.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 
@@ -17,10 +19,10 @@ public enum EntryType
 
 public readonly record struct SizeUnit(double Size, string Unit)
 {
-    public static readonly SizeUnit KibiByte = new(1024, "KiB");
-    public static readonly SizeUnit MebiByty = new(KibiByte.Size * 1024, "MiB");
-    public static readonly SizeUnit GibiByte = new(MebiByty.Size * 1024, "GiB");
-    public static readonly SizeUnit TebiByte = new(GibiByte.Size * 1024, "TiB");
+    private static readonly SizeUnit KibiByte = new(1024, "KiB");
+    private static readonly SizeUnit MebiByty = new(KibiByte.Size * 1024, "MiB");
+    private static readonly SizeUnit GibiByte = new(MebiByty.Size * 1024, "GiB");
+    private static readonly SizeUnit TebiByte = new(GibiByte.Size * 1024, "TiB");
 
     public static SizeUnit GetSize(ulong rawSize)
     {
@@ -46,87 +48,85 @@ public readonly record struct FileMetaData(
 );
 
 
-public sealed class TactEntry
+public sealed record TactEntry(string Name, EntryType Type, FileMetaData? FileMetaData = null, TactEntry? Parent = null)
 {
-    public List<TactEntry> Files { get; private set; } = [];
-    public List<TactEntry> Directories { get; private set; } = [];
-    public string Name { get; private set; } = string.Empty;
-    public EntryType Type { get; private set; } 
-    public TactEntry? Parent { get; private set; } = null;
-    
-    public FileMetaData? MetaData { get; private set; } = null;
-    public TactEntry(string name, EntryType type, FileMetaData? metadata = null, TactEntry? parent = null)
-    {
-        if (parent is not null) 
-            Parent = parent;
-        
-        if (metadata is not null)
-            MetaData = metadata;
-        
-        Type = type;
-        Name = name;
-    }
 
+    private readonly List<TactEntry> _files = [];
+    private readonly List<TactEntry> _directories = [];
+
+    public IReadOnlyList<TactEntry> Files => _files.ToImmutableList();
+    public IReadOnlyList<TactEntry> Directories => _directories.ToImmutableList();
+    
+    /// <summary>
+    /// Returns both files and directories of this node.
+    /// </summary>
+    public IEnumerable<TactEntry> All
+    {
+        get
+        {
+           if (Files is { Count: > 0 } && Directories is { Count: > 0 })
+           {
+               return Files.Concat(Directories);
+           }
+           
+           return [];
+        }
+    }
+    
+    /// <summary>
+    /// Reconstitute the path of this TACT entry, including all parent directories.
+    /// </summary>
+    /// <returns>Path</returns>
     public string ReconstitutePath()
     {
-        var paths = new List<string>();
         var current = this;
+        if (current.Parent is null) return current.Name;
         
-        if (current.Parent is null)
-            return current.Name;
+        var paths = new List<string>();
         
-        while (current.Parent is not null)
+        while (current is not null)
         {
             paths.Add(current.Name);
             current = current.Parent;
-        }
+        } 
         
         paths.Reverse();
         return string.Join('/', paths);
     }
 
+    /// <summary>
+    /// Add a child entry to this TACT entry.
+    /// </summary>
+    /// <param name="child">Child</param>
     public void AddChild(TactEntry child)
     {
-        if (child.Type == EntryType.File)
-            Files.Add(child);
-        else
-            Directories.Add(child);
-        
-        child.Parent = this;
+        var collection = child.Type == EntryType.File ? _files : _directories;
+        collection.Add(child);
+        child = child with { Parent = this };
     }
 }
 
-
 public sealed class TactEntryBuilder(string name, EntryType type, FileMetaData? fileMetaData = null, TactEntryBuilder? parent = null)
 {
-    private readonly string _name = name;
-    private readonly EntryType _type = type;
-    private readonly FileMetaData? _fileMetaData = fileMetaData;
-    private TactEntryBuilder? _parent = parent;
-
     private readonly Dictionary<string, TactEntryBuilder> _children =
         new(StringComparer.Ordinal);
-
-    public TactEntryBuilder GetOrAdd(string name, EntryType type, FileMetaData? fileMetaData = null, TactEntryBuilder? parent = null)
+    public TactEntryBuilder GetOrAdd(string entryName, EntryType entryType, FileMetaData? entryMetaData = null)
     {
-        if (!_children.TryGetValue(name, out var child))
-        {
-            child = new TactEntryBuilder(name, type, fileMetaData, this);
-            _children[name] = child;
-        }
+        if (_children.TryGetValue(entryName, out var child)) return child;
         
+        child = new TactEntryBuilder(entryName, entryType, entryMetaData, this);
+        _children[entryName] = child;
+
         return child;
     }
-
     public TactEntry ToTactEntry()
     {
-        var me = new TactEntry(_name, _type, _fileMetaData);
+        var me = new TactEntry(name, type, fileMetaData);
 
-        foreach (var child in _children.Values)
-        {
-            var childEntry = child.ToTactEntry();
+        var entries = _children.Values.Select(child => child.ToTactEntry());
+        
+        foreach (var childEntry in entries)
             me.AddChild(childEntry);
-        }
         
         return me;
     }
